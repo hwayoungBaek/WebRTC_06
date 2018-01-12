@@ -22,7 +22,9 @@ btn_start.addEventListener('click', onStart);
 btn_send.addEventListener('click', onSend);
 // ---------------------------------------------------------------------------------
 function onSend(){
-    sendDataViaDataChannel(input_message.value);
+    //sendDataViaDataChannel(input_message.value);
+    g_mc_ws_component.sendMessage(JSON.stringify({ type: '77', text: input_message.value}));
+    document.querySelector("div#receive").innerHTML += '<br/>' + input_message.value; // 내 화면에도 보여주기
 }
 // ---------------------------------------------------------------------------------
 
@@ -68,6 +70,18 @@ function onWsMessage(messageEvt) {
         onOffer();
     }
     else if (obj.code == '00') {
+        try{
+            var obj2 = JSON.parse(obj.msg);
+            console.info('---------------obj2',obj2);
+            console.info('---------------obj2.type',obj2.type);
+            console.info('---------------obj2.msg',obj2.text);
+            if(obj2.type == '77'){   // 채팅 데이터 받기
+                // receive에 뿌려주기
+                document.querySelector("div#receive").innerHTML += '<br/>' + obj2.text;
+                return;
+            }
+        }catch(error){
+        }
         receiveAnswer(obj.msg);
     }    
     else {
